@@ -27,8 +27,8 @@ public:
 
 	enum
 	{
-		e_maxColumns = 26,
-		e_maxRows = 130,
+		e_maxColumns = 100,
+		e_maxRows = 100,
 	};
 
 	explicit BenchmarkBarrel( Settings& settings )
@@ -90,8 +90,8 @@ public:
 			}
 		}
 
-		m_columnCount = g_sampleDebug ? 10 : e_maxColumns;
-		m_rowCount = g_sampleDebug ? 40 : e_maxRows;
+		m_columnCount = e_maxColumns;
+		m_rowCount = e_maxRows;
 
 		if ( m_shapeType == e_compoundShape )
 		{
@@ -606,9 +606,9 @@ public:
 		}
 
 #ifdef NDEBUG
-		int baseCount = 100;
+		int baseCount = 200;
 #else
-		int baseCount = 40;
+		int baseCount = 0;
 #endif
 
 		{
