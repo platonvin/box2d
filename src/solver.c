@@ -22,21 +22,30 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#if defined( B2_CPU_ARM )
+#if ( defined( __GNUC__ ) || defined( __clang__ ) ) && ( defined( __i386__ ) || defined( __x86_64__ ) )
 static inline void b2Pause( void )
 {
-	__asm__ __volatile__( "isb\n" );
+	__asm__ __volatile__( "pause\n" );
 }
-#elif defined( B2_CPU_X86_X64 )
-#include <immintrin.h>
+#elif ( defined( __arm__ ) && defined( __ARM_ARCH ) && __ARM_ARCH >= 7 ) || defined( __aarch64__ )
+static inline void b2Pause( void )
+{
+	__asm__ __volatile__( "yield" ::: "memory" );
+}
+#elif defined( _MSC_VER ) && ( defined( _M_IX86 ) || defined( _M_X64 ) )
+//#include <immintrin.h>
 static inline void b2Pause( void )
 {
 	_mm_pause();
 }
+#elif defined( _MSC_VER ) && ( defined( _M_ARM ) || defined( _M_ARM64 ) )
+static inline void b2Pause( void )
+{
+	__yield();
+}
 #else
 static inline void b2Pause( void )
 {
-	// no threading will likely be used in web assembly
 }
 #endif
 
@@ -1712,7 +1721,9 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 				{
 					b2ManifoldPoint* mp = contactSim->manifold.points + k;
 					float approachSpeed = -mp->normalVelocity;
-					if ( approachSpeed > event.approachSpeed && mp->normalImpulse > 0.0f )
+
+					// Need to check max impulse because the point may be speculative and not colliding
+					if ( approachSpeed > event.approachSpeed && mp->maxNormalImpulse > 0.0f )
 					{
 						event.approachSpeed = approachSpeed;
 						event.point = mp->point;

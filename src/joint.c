@@ -83,6 +83,13 @@ b2WheelJointDef b2DefaultWheelJointDef( void )
 	return def;
 }
 
+b2ExplosionDef b2DefaultExplosionDef(void)
+{
+	b2ExplosionDef def = { 0 };
+	def.maskBits = B2_DEFAULT_MASK_BITS;
+	return def;
+}
+
 static b2Joint* b2GetJointFullId( b2World* world, b2JointId jointId )
 {
 	int id = jointId.index1 - 1;
@@ -787,6 +794,12 @@ b2BodyId b2Joint_GetBodyB( b2JointId jointId )
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	return b2MakeBodyId( world, joint->edges[1].bodyId );
+}
+
+b2WorldId b2Joint_GetWorld( b2JointId jointId )
+{
+	b2World* world = b2GetWorld( jointId.world0 );
+	return ( b2WorldId ){ jointId.world0 + 1, world->revision };
 }
 
 b2Vec2 b2Joint_GetLocalAnchorA( b2JointId jointId )

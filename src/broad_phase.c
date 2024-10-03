@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+#if defined( _MSC_VER ) && !defined( _CRT_SECURE_NO_WARNINGS )
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include "broad_phase.h"
 
@@ -358,8 +360,11 @@ void b2UpdateBroadPhasePairs( b2World* world )
 
 	int minRange = 64;
 	void* userPairTask = world->enqueueTaskFcn( &b2FindPairsTask, moveCount, minRange, world, world->userTaskContext );
-	world->finishTaskFcn( userPairTask, world->userTaskContext );
-	world->taskCount += 1;
+	if (userPairTask != NULL)
+	{
+		world->finishTaskFcn( userPairTask, world->userTaskContext );
+		world->taskCount += 1;
+	}
 
 	b2TracyCZoneNC( create_contacts, "Create Contacts", b2_colorGold, true );
 

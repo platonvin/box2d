@@ -533,7 +533,12 @@ public:
 
 		if ( ImGui::Button( "Explode" ) )
 		{
-			b2World_Explode( m_worldId, m_explosionPosition, m_explosionRadius, m_explosionMagnitude );
+			b2ExplosionDef def = b2DefaultExplosionDef();
+			def.position = m_explosionPosition;
+			def.radius = m_explosionRadius;
+			def.falloff = 0.1f;
+			def.impulsePerLength = m_explosionMagnitude;
+			b2World_Explode( m_worldId, &def );
 		}
 		ImGui::PushItemWidth( 100.0f );
 
@@ -785,7 +790,7 @@ public:
 			b2BodyDef bodyDef = b2DefaultBodyDef();
 			bodyDef.type = b2_dynamicBody;
 			bodyDef.position = { 0.0f, 3.0f };
-			bodyDef.angularVelocity = 0.2f;
+			bodyDef.angularVelocity = 0.5f;
 			bodyDef.rotation = b2MakeRot( 0.25f * b2_pi );
 
 			m_badBodyId = b2CreateBody( m_worldId, &bodyDef );
