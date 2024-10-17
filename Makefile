@@ -24,15 +24,15 @@ O_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 LIB_OBJ := $(LIB_DIR)/box2d.o
 LIB := $(LIB_DIR)/libbox2d.a
 
-all: release_incremental
+all: setup release_incremental
 
-release_incremental: $(LIB)
+release_incremental: setup $(LIB)
 
-$(LIB): $(O_FILES) $(LIB_DIR)
+$(LIB): $(O_FILES) $(LIB_DIR) setup
 	$(AR) rs $(LIB) $(O_FILES) 
 
 # actual compilation
-$(OBJ_DIR)/%.o: $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(OBJ_DIR) setup
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(COMPILER) $(RELEASE_FLAGS) $(I) -MMD -MP -c $< -o $@
 # "-" to not crash when not found
@@ -43,6 +43,8 @@ $(LIB_DIR):
 	mkdir $(LIB_DIR)
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
+
+setup: $(LIB_DIR) $(OBJ_DIR)
 
 clean:
 ifeq ($(OS),Windows_NT)
